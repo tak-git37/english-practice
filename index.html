@@ -49,12 +49,25 @@ $("record").onclick=async()=>{
       try{
         const blob=new Blob(chunks,{type:rec.mimeType||"audio/mp4"});
         const ab=await blob.arrayBuffer();
-        const ac=new AudioContext();
-        const audio=await ac.decodeAudioData(ab);
-        const ch=audio.getChannelData(0), ratio=audio.sampleRate/16000;
-        const out=new Float32Array(Math.floor(ch.length/ratio));
-        for(let n=0;n<out.length;n++)out[n]=ch[Math.min(ch.length-1,Math.floor(n*ratio))];
-        const r=await transcriber(out,{language:"en",task:"transcribe"});
+        const AudioCtx=window.AudioContext||window.webkitAudioContext;
+        if(!AudioCtx) throw new Error("Web Audio is not supported.");
+        const ac=new AudioCtx();
+        const audio=await ac.decodeAudioData(ab.slice(0));
+        // Mix all channels to mono and resample to 16 kHz for Whisper.
+        const channels=audio.numberOfChannels, srcRate=audio.sampleRate;
+        const frames=audio.length;
+        const mono=new Float32Array(frames);
+        for(let c=0;c<channels;c++){
+          const data=audio.getChannelData(c);
+          for(let n=0;n<frames;n++) mono[n]+=data[n]/channels;
+        }
+        const ratio=srcRate/16000;
+        const out=new Float32Array(Math.max(1,Math.floor(frames/ratio)));
+        for(let n=0;n<out.length;n++){
+          const pos=n*ratio, p0=Math.floor(pos), p1=Math.min(frames-1,p0+1), frac=pos-p0;
+          out[n]=mono[p0]*(1-frac)+mono[p1]*frac;
+        }
+        const r=await transcriber(out,{language:"en",task:"transcribe",return_timestamps:false});
         const txt=r.text||"", sc=score(items[i],txt);
         $("heard").textContent="Recognized:\n"+(txt||"(no speech recognized)");
         $("score").textContent=sc+"%";
@@ -67,7 +80,7 @@ $("record").onclick=async()=>{
           $("status").textContent="TRY AGAIN — aim for clearer words and rhythm.";
         }
         await ac.close();
-      }catch(e){console.error(e);$("status").textContent="Could not transcribe this recording. Please try again."}
+      }catch(e){console.error(e);$("status").textContent="Transcription error: "+(e?.message||String(e))}
       busy=false;
     };
     rec.start();
