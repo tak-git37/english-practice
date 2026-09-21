@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily English Speech Practice</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;background:#f6f7f9;margin:0;color:#111}
+.wrap{max-width:680px;margin:auto;padding:20px}.card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 2px 12px #0001}
+h1{font-size:24px;margin:0 0 8px}.sub,.small{color:#666;font-size:14px}.progress{height:8px;background:#e5e7eb;border-radius:8px;overflow:hidden;margin:14px 0}.bar{height:100%;width:10%;background:#111}
+.target{font-size:24px;line-height:1.45;font-weight:600;margin:22px 0}button{width:100%;padding:15px;margin:7px 0;border:0;border-radius:12px;font-size:17px;font-weight:600}.listen{background:#e8eefc}.record{background:#111;color:#fff}.next{background:#dff5e5}.next:disabled{opacity:.4}
+.status{padding:12px;border-radius:10px;background:#f1f3f5;min-height:22px;white-space:pre-wrap}.score{font-size:34px;font-weight:700;text-align:center;margin:14px 0}.pass{color:#087f3f}.fail{color:#b42318}
+.small{font-size:12px;line-height:1.5;margin-top:14px}
+</style></head><body><div class="wrap"><div class="card">
+<h1>Daily English Speech Practice</h1><div class="sub">Listen → Speak → Score → PASS → Next</div>
+<div class="progress"><div id="bar" class="bar"></div></div><div id="count">1 / 10</div><div id="target" class="target"></div>
+<button class="listen" id="listen">🔊 Listen</button><button class="record" id="record">🎙️ Speak</button>
+<div id="score" class="score"></div><div id="heard" class="status">Tap Speak and say the sentence naturally.</div>
+<button class="next" id="next" disabled>Next →</button><div id="status" class="status">Loading speech model… The first load can take a while.</div>
+<p class="small">Privacy-first mode: recording and transcription are performed in the browser with Whisper. No API key is required. The first model download may be large.</p>
+</div></div>
+<script type="module">
+import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+env.allowLocalModels=false; env.useBrowserCache=true;
+const items=["Can I just get a cheeseburger with no onions, please?","What size?","That's it.","I'll do a medium.","Do you guys still do the cotton candy milkshake?","What did you get?","I don't know what it is.","It tastes like bubble gum.","It's not worth waiting an hour for.","I hope you guys enjoyed this video."];
+let i=0,rec=null,chunks=[],transcriber=null,busy=false; const $=x=>document.getElementById(x);
+function render(){$("count").textContent=`${i+1} / ${items.length}`;$("target").textContent=items[i];$("bar").style.width=((i+1)/items.length*100)+"%";$("score").textContent="";$("score").className="score";$("heard").textContent="Tap Speak and say the sentence naturally.";$("next").disabled=true}
+render();
+function norm(s){return s.toLowerCase().replace(/[.,!?;:'"’]/g,"").replace(/\s+/g," ").trim()}
+function lev(a,b){let A=a.split(" "),B=b.split(" "),d=Array.from({length:A.length+1},()=>Array(B.length+1).fill(0));for(let x=0;x<=A.length;x++)d[x][0]=x;for(let y=0;y<=B.length;y++)d[0][y]=y;for(let x=1;x<=A.length;x++)for(let y=1;y<=B.length;y++)d[x][y]=Math.min(d[x-1][y]+1,d[x][y-1]+1,d[x-1][y-1]+(A[x-1]===B[y-1]?0:1));return d[A.length][B.length]}
+function score(a,b){a=norm(a);b=norm(b);let m=Math.max(a.split(" ").length,b.split(" ").length);return Math.max(0,Math.round((1-lev(a,b)/m)*100))}
+$("listen").onclick=()=>{let u=new SpeechSynthesisUtterance(items[i]);u.lang="en-US";u.rate=.82;speechSynthesis.cancel();speechSynthesis.speak(u)};
+async function load(){try{$("status").textContent="Loading Whisper speech model… First load may be several hundred MB.";transcriber=await pipeline("automatic-speech-recognition","onnx-community/whisper-tiny.en",{device:"wasm"});$("status").textContent="Ready. Tap Speak, then talk for 2–8 seconds."}catch(e){console.error(e);$("status").textContent="Model could not load. Reload and check your internet connection."}} load();
+$("record").onclick=async()=>{if(busy)return;if(!navigator.mediaDevices?.getUserMedia){$("status").textContent="This browser cannot access the microphone.";return}if(!transcriber){$("status").textContent="Speech model is still loading. Please wait.";return}
+try{busy=true;$("record").textContent="⏺️ Recording… tap again to stop";chunks=[];let stream=await navigator.mediaDevices.getUserMedia({audio:true});rec=new MediaRecorder(stream);rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());$("record").textContent="🎙️ Speak";$("status").textContent="Transcribing on this device…";try{let blob=new Blob(chunks,{type:rec.mimeType||"audio/mp4"}),ab=await blob.arrayBuffer(),ac=new AudioContext(),audio=await ac.decodeAudioData(ab),ch=audio.getChannelData(0),ratio=audio.sampleRate/16000,out=new Float32Array(Math.floor(ch.length/ratio));for(let n=0;n<out.length;n++)out[n]=ch[Math.min(ch.length-1,Math.floor(n*ratio))];let r=await transcriber(out,{language:"en",task:"transcribe"}),txt=r.text||"",sc=score(items[i],txt);$("heard").textContent="Recognized:\n"+(txt||"(no speech recognized)");$("score").textContent=sc+"%";if(sc>=80){$("score").className="score pass";$("status").textContent="PASS — good enough. You can move to the next expression.";$("next").disabled=false}else{$("score").className="score fail";$("status").textContent="TRY AGAIN — aim for clearer words and rhythm."}await ac.close()}catch(e){console.error(e);$("status").textContent="Could not transcribe this recording. Please try again."}busy=false};rec.start()}catch(e){console.error(e);busy=false;$("record").textContent="🎙️ Speak";$("status").textContent="Microphone permission was denied or unavailable. Allow microphone access for this site in Safari."}};
+$("next").onclick=()=>{if($("next").disabled)return;if(i<items.length-1){i++;render()}else{$("target").textContent="🎉 Practice complete!";$("count").textContent="10 / 10";$("next").disabled=true;$("status").textContent="Great. You completed all 10 expressions."}};
+</script></body></html>
