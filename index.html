@@ -1,262 +1,80 @@
 <!doctype html>
-<html lang="ja">
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Daily English Speech Practice</title>
 <style>
-*{box-sizing:border-box} body{margin:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#172033}
-.wrap{max-width:620px;margin:0 auto;padding:18px 14px 40px}
-header{background:#172033;color:#fff;border-radius:20px;padding:20px;margin-bottom:14px}
-h1{font-size:23px;margin:0 0 6px} header p{margin:0;opacity:.86;font-size:14px}
-.card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 4px 18px rgba(0,0,0,.07);display:none}
-.card.active{display:block} .num{font-size:13px;color:#667085;margin-bottom:12px}
-h2{font-size:25px;line-height:1.35;margin:0 0 10px} .jp{color:#667085;margin-bottom:20px}
-.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-button{border:0;border-radius:14px;padding:15px 10px;font-size:16px;font-weight:700;cursor:pointer}
-.listen{background:#eef2ff;color:#263a8b} .speak{background:#111827;color:#fff}
-.status{margin-top:16px;padding:12px;border-radius:12px;background:#f2f4f7;font-size:14px;line-height:1.45}
-.recognized{margin-top:12px;font-size:17px;line-height:1.5;min-height:25px}
-.score{font-size:25px;font-weight:800;margin-top:8px}
-.next{width:100%;margin-top:18px;background:#0b7a4b;color:white} .next:disabled{opacity:.35}
-.manual{margin-top:22px;padding-top:16px;border-top:1px solid #eee}
-.manual label{display:block;font-size:12px;color:#667085;margin-bottom:7px}
-.manual input{width:100%;padding:13px;border:1px solid #d0d5dd;border-radius:12px;font-size:15px;margin-bottom:8px}
-.manual button{padding:10px 14px;background:#eee}
-.note{margin:14px 0;padding:12px;border-radius:12px;background:#fff8e1;font-size:13px;line-height:1.5}
-.done{display:none;background:#fff;padding:24px;border-radius:20px;text-align:center}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header><h1>🎤 Daily English Speech Practice</h1><p>Listen → Speak → Score → PASS → Next</p></header>
-<div class="note" id="note">
-iPhone Safariで使うには、このページをHTTPSで公開してください。マイク録音はこのページ内だけで行い、音声を外部へ送信する処理は入れていません。
-</div>
-
-<section class="card" data-i="0">
-  <div class="num">1 / 10</div>
-  <h2>Can I just get a cheeseburger with no onions, please?</h2>
-  <p class="jp">注文で「〜をお願いします」と言う</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="1">
-  <div class="num">2 / 10</div>
-  <h2>What size?</h2>
-  <p class="jp">サイズを確認する</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="2">
-  <div class="num">3 / 10</div>
-  <h2>That&#x27;s it.</h2>
-  <p class="jp">以上です</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="3">
-  <div class="num">4 / 10</div>
-  <h2>I&#x27;ll do a medium.</h2>
-  <p class="jp">サイズなどを選ぶ</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="4">
-  <div class="num">5 / 10</div>
-  <h2>Do you guys still do the cotton candy milkshake?</h2>
-  <p class="jp">まだ〜をやっていますか？</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="5">
-  <div class="num">6 / 10</div>
-  <h2>What did you get?</h2>
-  <p class="jp">何を買った／頼んだの？</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="6">
-  <div class="num">7 / 10</div>
-  <h2>I don&#x27;t know what it is.</h2>
-  <p class="jp">それが何なのか分からない</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="7">
-  <div class="num">8 / 10</div>
-  <h2>It tastes like bubble gum.</h2>
-  <p class="jp">〜のような味がする</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="8">
-  <div class="num">9 / 10</div>
-  <h2>It&#x27;s not worth waiting an hour for.</h2>
-  <p class="jp">1時間待つほどの価値はない</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<section class="card" data-i="9">
-  <div class="num">10 / 10</div>
-  <h2>I hope you guys enjoyed this video.</h2>
-  <p class="jp">動画の締めで使う表現</p>
-  <div class="buttons">
-    <button class="listen" onclick="speakTarget()">🔊 Listen</button>
-    <button class="speak" onclick="startPractice()">🎤 Speak</button>
-  </div>
-  <div id="status" class="status">Speakを押して英文を言ってください。</div>
-  <div id="recognized" class="recognized"></div>
-  <div id="score" class="score"></div>
-  <div class="manual">
-    <label>音声認識できない場合：認識した英文を入力</label>
-    <input id="manualInput" type="text" placeholder="例: Can I just get a cheeseburger...">
-    <button onclick="checkManual()">Check</button>
-  </div>
-  <button id="next" class="next" onclick="nextCard()" disabled>Next →</button>
-</section>
-
-<div class="done" id="done"><h2>🎉 Complete!</h2><p>10 expressions finished.</p><button onclick="location.reload()">もう一度</button></div>
-</div>
-<script>
-const phrases = [('Can I just get a cheeseburger with no onions, please?', '注文で「〜をお願いします」と言う'), ('What size?', 'サイズを確認する'), ("That's it.", '以上です'), ("I'll do a medium.", 'サイズなどを選ぶ'), ('Do you guys still do the cotton candy milkshake?', 'まだ〜をやっていますか？'), ('What did you get?', '何を買った／頼んだの？'), ("I don't know what it is.", 'それが何なのか分からない'), ('It tastes like bubble gum.', '〜のような味がする'), ("It's not worth waiting an hour for.", '1時間待つほどの価値はない'), ('I hope you guys enjoyed this video.', '動画の締めで使う表現')];
-let idx=0, recognition=null, mediaStream=null, recorder=null, chunks=[];
-const cards=[...document.querySelectorAll('.card')];
-function show(){cards.forEach((c,i)=>c.classList.toggle('active',i===idx));}
-show();
-
-function norm(s){return s.toLowerCase().replace(/[^a-z0-9' ]/g,' ').replace(/\s+/g,' ').trim();}
-function edit(a,b){let d=Array.from({length:a.length+1},()=>Array(b.length+1).fill(0));for(let i=0;i<=a.length;i++)d[i][0]=i;for(let j=0;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]:Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+1);return d[a.length][b.length];}
-function score(target,heard){let a=norm(target).split(' '),b=norm(heard).split(' ');if(!a.length)return 0;let e=edit(a,b), s=Math.max(0,1-e/Math.max(a.length,b.length||1));let set=new Set(b), overlap=a.filter(x=>set.has(x)).length/a.length;return Math.round((s*.6+overlap*.4)*100);}
-function speakTarget(){let u=new SpeechSynthesisUtterance(phrases[idx][0]);u.lang='en-US';u.rate=.82; speechSynthesis.cancel(); speechSynthesis.speak(u);}
-function setResult(heard){let c=cards[idx], s=score(phrases[idx][0],heard);c.querySelector('#recognized').textContent='You said: '+heard;c.querySelector('#score').textContent=s+'%';c.querySelector('.status').textContent=s>=80?'✅ PASS — Nextへ進めます。':'🔁 TRY AGAIN — 80%以上を目指しましょう。';c.querySelector('#next').disabled=s<80;}
-function startPractice(){
- let c=cards[idx]; c.querySelector('.status').textContent='🎤 Listening... 話してください。';
- const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(SR){
-   try{recognition=new SR();recognition.lang='en-US';recognition.interimResults=false;recognition.maxAlternatives=1;
-   recognition.onresult=e=>setResult(e.results[0][0].transcript);
-   recognition.onerror=e=>{c.querySelector('.status').textContent='音声認識エラー: '+e.error+'。下の入力欄も使えます。';};
-   recognition.onend=()=>{};
-   recognition.start(); return;}catch(e){}
- }
- // Fallback: request microphone access so the page is confirmed to have permission.
- if(navigator.mediaDevices?.getUserMedia){
-   navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-     mediaStream=stream; c.querySelector('.status').textContent='🎤 マイクOK。Safariの音声認識が利用できないため、下の入力欄に発話内容を入力してCheckしてください。';
-     stream.getTracks().forEach(t=>t.stop());
-   }).catch(()=>c.querySelector('.status').textContent='マイク許可が必要です。Safariのサイト設定でMicrophoneをAllowにしてください。');
- }else c.querySelector('.status').textContent='このブラウザでは音声認識が利用できません。下の入力欄をご利用ください。';
-}
-function checkManual(){let v=cards[idx].querySelector('#manualInput').value.trim();if(v)setResult(v);}
-function nextCard(){if(cards[idx].querySelector('#next').disabled)return;idx++;if(idx>=cards.length){cards.forEach(c=>c.classList.remove('active'));document.getElementById('done').style.display='block';}else show();}
-</script>
-</body></html>
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;background:#f6f7f9;margin:0;color:#111}
+.wrap{max-width:680px;margin:auto;padding:20px}.card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 2px 12px #0001}
+h1{font-size:24px;margin:0 0 8px}.sub,.small{color:#666;font-size:14px}.progress{height:8px;background:#e5e7eb;border-radius:8px;overflow:hidden;margin:14px 0}.bar{height:100%;width:10%;background:#111}
+.target{font-size:24px;line-height:1.45;font-weight:600;margin:22px 0}button{width:100%;padding:15px;margin:7px 0;border:0;border-radius:12px;font-size:17px;font-weight:600}.listen{background:#e8eefc}.record{background:#111;color:#fff}.next{background:#dff5e5}.next:disabled{opacity:.4}
+.status{padding:12px;border-radius:10px;background:#f1f3f5;min-height:22px;white-space:pre-wrap}.score{font-size:34px;font-weight:700;text-align:center;margin:14px 0}.pass{color:#087f3f}.fail{color:#b42318}
+.small{font-size:12px;line-height:1.5;margin-top:14px}
+</style></head><body><div class="wrap"><div class="card">
+<h1>Daily English Speech Practice</h1><div class="sub">Listen → Speak → Score → PASS → Next</div>
+<div class="progress"><div id="bar" class="bar"></div></div><div id="count">1 / 10</div><div id="target" class="target"></div>
+<button class="listen" id="listen">🔊 Listen</button><button class="record" id="record">🎙️ Speak</button>
+<div id="score" class="score"></div><div id="heard" class="status">Tap Speak and say the sentence naturally.</div>
+<button class="next" id="next" disabled>Next →</button><div id="status" class="status">Loading speech model… The first load can take a while.</div>
+<p class="small">Privacy-first mode: recording and transcription are performed in the browser with Whisper. No API key is required. The first model download may be large.</p>
+</div></div>
+<script type="module">
+import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+env.allowLocalModels=false; env.useBrowserCache=true;
+const items=["Can I just get a cheeseburger with no onions, please?","What size?","That's it.","I'll do a medium.","Do you guys still do the cotton candy milkshake?","What did you get?","I don't know what it is.","It tastes like bubble gum.","It's not worth waiting an hour for.","I hope you guys enjoyed this video."];
+let i=0,rec=null,chunks=[],transcriber=null,busy=false; const $=x=>document.getElementById(x);
+function render(){$("count").textContent=`${i+1} / ${items.length}`;$("target").textContent=items[i];$("bar").style.width=((i+1)/items.length*100)+"%";$("score").textContent="";$("score").className="score";$("heard").textContent="Tap Speak and say the sentence naturally.";$("next").disabled=true}
+render();
+function norm(s){return s.toLowerCase().replace(/[.,!?;:'"’]/g,"").replace(/\s+/g," ").trim()}
+function lev(a,b){let A=a.split(" "),B=b.split(" "),d=Array.from({length:A.length+1},()=>Array(B.length+1).fill(0));for(let x=0;x<=A.length;x++)d[x][0]=x;for(let y=0;y<=B.length;y++)d[0][y]=y;for(let x=1;x<=A.length;x++)for(let y=1;y<=B.length;y++)d[x][y]=Math.min(d[x-1][y]+1,d[x][y-1]+1,d[x-1][y-1]+(A[x-1]===B[y-1]?0:1));return d[A.length][B.length]}
+function score(a,b){a=norm(a);b=norm(b);let m=Math.max(a.split(" ").length,b.split(" ").length);return Math.max(0,Math.round((1-lev(a,b)/m)*100))}
+$("listen").onclick=()=>{let u=new SpeechSynthesisUtterance(items[i]);u.lang="en-US";u.rate=.82;speechSynthesis.cancel();speechSynthesis.speak(u)};
+async function load(){try{$("status").textContent="Loading Whisper speech model… First load may be several hundred MB.";transcriber=await pipeline("automatic-speech-recognition","onnx-community/whisper-tiny.en",{device:"wasm"});$("status").textContent="Ready. Tap Speak, then talk for 2–8 seconds."}catch(e){console.error(e);$("status").textContent="Model could not load. Reload and check your internet connection."}} load();
+$("record").onclick=async()=>{
+  if(busy && rec && rec.state==="recording"){ rec.stop(); return; }
+  if(busy)return;
+  if(!navigator.mediaDevices?.getUserMedia){$("status").textContent="This browser cannot access the microphone.";return}
+  if(!transcriber){$("status").textContent="Speech model is still loading. Please wait.";return}
+  try{
+    busy=true; chunks=[];
+    $("record").textContent="⏹️ Stop recording";
+    $("status").textContent="Recording… Say the sentence, then tap Stop.";
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const mime=MediaRecorder.isTypeSupported("audio/mp4")?"audio/mp4":
+               (MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"");
+    rec=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
+    rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+    rec.onstop=async()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      $("record").textContent="🎙️ Speak";
+      $("status").textContent="Transcribing on this device…";
+      try{
+        const blob=new Blob(chunks,{type:rec.mimeType||"audio/mp4"});
+        const ab=await blob.arrayBuffer();
+        const ac=new AudioContext();
+        const audio=await ac.decodeAudioData(ab);
+        const ch=audio.getChannelData(0), ratio=audio.sampleRate/16000;
+        const out=new Float32Array(Math.floor(ch.length/ratio));
+        for(let n=0;n<out.length;n++)out[n]=ch[Math.min(ch.length-1,Math.floor(n*ratio))];
+        const r=await transcriber(out,{language:"en",task:"transcribe"});
+        const txt=r.text||"", sc=score(items[i],txt);
+        $("heard").textContent="Recognized:\n"+(txt||"(no speech recognized)");
+        $("score").textContent=sc+"%";
+        if(sc>=80){
+          $("score").className="score pass";
+          $("status").textContent="PASS — good enough. You can move to the next expression.";
+          $("next").disabled=false;
+        }else{
+          $("score").className="score fail";
+          $("status").textContent="TRY AGAIN — aim for clearer words and rhythm.";
+        }
+        await ac.close();
+      }catch(e){console.error(e);$("status").textContent="Could not transcribe this recording. Please try again."}
+      busy=false;
+    };
+    rec.start();
+  }catch(e){
+    console.error(e); busy=false; $("record").textContent="🎙️ Speak";
+    $("status").textContent="Microphone permission was denied or unavailable. Allow microphone access for this site in Safari.";
+  }
+};
+$("next").onclick=()=>{if($("next").disabled)return;if(i<items.length-1){i++;render()}else{$("target").textContent="🎉 Practice complete!";$("count").textContent="10 / 10";$("next").disabled=true;$("status").textContent="Great. You completed all 10 expressions."}};
+</script></body></html>
